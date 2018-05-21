@@ -155,31 +155,30 @@ exports.check = (req, res, next) => {
 };
 
 exports.randomplay = (req, res, next) => {
-    if(req.session.toBeResolved === undefined){
+
+    if (req.session.toBeResolved === undefined) {
         req.session.score = 0;
         models.quiz.findAll()
-        .then(quizzes => {
-            req.session.toBeResolved = quizzes;
-            const azar = Math.floor(Math.random()*req.session.toBeResolved.length);
-            const quiz = req.session.toBeResolved[azar];
-            req.session.toBeResolved.splice(azar, 1);
-            const score = req.session.score;
-            res.render('quizzes/randomplay', {
-                quiz: quiz,
-                score: score
-            })    
-        })
-        .catch(error => next(error));
+            .then(quizzes => {
+                req.session.toBeResolved = quizzes;
+                const azar = Math.floor(Math.random() * req.session.toBeResolved.length);
+                const quiz = req.session.toBeResolved[azar];
+                req.session.toBeResolved.splice(azar, 1);
+                const score = req.session.score;
+                res.render('quizzes/random_play', {
+                    quiz: quiz,
+                    score: score
+                })
+            }).catch(error => next(error));
     } else {
-        const azar = Math.floor(Math.random()*req.session.toBeResolved.length);
+        const azar = Math.floor(Math.random() * req.session.toBeResolved.length);
         const quiz = req.session.toBeResolved[azar];
         req.session.toBeResolved.splice(azar, 1);
         const score = req.session.score;
-        res.render('quizzes/randomplay', {
+        res.render("quizzes/random_play", {
             quiz: quiz,
             score: score
         });
-
     };
 };
 
