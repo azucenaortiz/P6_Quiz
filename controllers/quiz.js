@@ -6,7 +6,7 @@ exports.load = (req, res, next, quizId) => {
 
     models.quiz.findById(quizId)
     .then(quiz => {
-        if (quiz) {
+        if (quiz) {   
             req.quiz = quiz;
             next();
         } else {
