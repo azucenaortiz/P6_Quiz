@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "heroku local:start",
+    "start_old": "heroku local:start",
     "super": "supervisor ./bin/www",
-    "start_old": "node ./bin/www"
+    "start": "node ./bin/www"
   },
   "engines": {
     "node": "8.9.1",
@@ -24,8 +24,9 @@
     "method-override": "^2.3.10",
     "morgan": "~1.9.0",
     "pg": "7.4.0",
-    "sequelize": "^4.37.5",
+    "sequelize": "^4.37.8",
     "serve-favicon": "~2.4.5",
+    "sqlite3": "^3.1.13",
     "supervisor": "^0.12.0"
   },
   "devDependencies": {
