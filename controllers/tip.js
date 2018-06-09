@@ -20,7 +20,7 @@ exports.load = (req, res, next, tipId) => {
 
 // POST /quizzes/:quizId/tips
 exports.create = (req, res, next) => {
-
+ 
     const authorId = req.session.user && req.session.user.id || 0;
  
     const tip = models.tip.build(
@@ -29,6 +29,7 @@ exports.create = (req, res, next) => {
             quizId: req.quiz.id,
             authorId: authorId
         });
+
 
     tip.save()
     .then(tip => {
@@ -44,10 +45,6 @@ exports.create = (req, res, next) => {
         req.flash('error', 'Error creating the new tip: ' + error.message);
         next(error);
     });
-
-    if(req.session.user === undefined){
-        res.redirect("./login");
-    }
 };
 
 
@@ -69,19 +66,6 @@ exports.accept = (req, res, next) => {
     });
 };
 
-exports.adminOrAuthorRequired = (req, res, next) => {
-
-    const isAdmin  = !!req.session.user.isAdmin;
-    const isAuthor = req.tip.author.username === req.session.user.id;
-
-    if (isAdmin || isAuthor) {
-        next();
-    } else {
-        console.log('Prohibited operation: The logged in user is not the author of the quiz, nor an administrator.');
-        res.send(403);
-    }
-};
-
 
 // DELETE /quizzes/:quizId/tips/:tipId
 exports.destroy = (req, res, next) => {
@@ -94,39 +78,38 @@ exports.destroy = (req, res, next) => {
     .catch(error => next(error));
 };
 
+exports.adminOrAuthorRequired = (req, res, next) => {
+    const isAdmin = !!req.session.user.isAdmin;
+    const isAuthor = req.session.user.id === req.tip.authorId;
+    if (isAdmin || isAuthor ){
+        next();
+    }else{
+        res.send(403);
+    }
+};
+
 exports.edit = (req, res, next) => {
-
-    const {
-        tip
-    } = req;
-
-    res.render('tips/edit', {
-        tip
-    });
-
+    const {quiz, tip} = req;
+    res.render('tips/edit', {quiz, tip})
 };
 
 exports.update = (req, res, next) => {
-
-    const {
-        tip
-    } = req;
-
-    tip.text = body.text;
+    const {quiz, tip} = req;
+    tip.text = req.body.text;
     tip.accepted = false;
 
-    tip.save({fields: ["text", "accepted"]})
-    .then(tip => {
-        req.flash('success', 'Tip edited successfully.');
-        res.redirect('/quizzes/' + req.params.quizId);
+    tip.save({fields: ["text", "answer"]})
+    .then(quiz => {
+        req.flash('success', 'Quiz edited successfully.');
+        res.redirect('/quizzes/' + quiz.id);
     })
     .catch(Sequelize.ValidationError, error => {
         req.flash('error', 'There are errors in the form:');
         error.errors.forEach(({message}) => req.flash('error', message));
-        res.render('tips/edit', {tip});
+        res.render('tips/edit', {quiz, tip});
     })
     .catch(error => {
-        req.flash('error', 'Error editing the Tip: ' + error.message);
+        req.flash('error', 'Error editing the Quiz: ' + error.message);
         next(error);
     });
 };
